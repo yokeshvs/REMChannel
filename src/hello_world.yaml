@@ -1,0 +1,230 @@
+swagger: "2.0"
+
+
+info:
+  description: "Equipment tracking dashboard"
+  version: "1.0"
+  title: "Equipment Tracker"
+
+
+consumes:
+  - application/x-www-form-urlencoded
+produces:
+  - application/json
+
+
+parameters:
+
+  id:
+    name: id
+    in: path
+    description: ID of the device
+    required: true
+    type: string
+    maxLength: 64
+
+
+  DStatus:
+    name: DStatus
+    in: formData
+    description: The Status of the device
+    required: true
+    type: string
+    maxLength: 255
+
+  Timestamp:
+    name: Timestamp
+    in: formData
+    description: The Timestamp of the message
+    required: true
+    type: string
+    maxLength: 255
+    
+  EdgeID:
+    name: EdgeID
+    in: formData
+    description: The EdgeID of the device
+    required: true
+    type: string
+    maxLength: 255
+    
+
+
+paths:
+
+  /{id}:
+
+    head:
+      operationId: exist
+      summary: Validate device's existance by ID
+      parameters:
+      - $ref: '#/parameters/id'
+      responses:
+        204:
+          description: Message Exists
+        400:
+          description: Parameter Mismatch
+        404:
+          description: Not Found
+
+
+    post:
+      operationId: create
+      summary: Creates a message by ID
+      parameters:
+      - $ref: '#/parameters/id'
+      - $ref: '#/parameters/DStatus'
+      - $ref: '#/parameters/Timestamp'
+      - $ref: '#/parameters/EdgeID'
+      responses:
+        201:
+          description:  Created
+        400:
+          description: Parameter Mismatch
+        409:
+          description:  Already Exists
+
+
+    put:
+      operationId: update
+      summary: Updates a message by ID
+      parameters:
+      - $ref: '#/parameters/id'
+      - $ref: '#/parameters/DStatus'
+      - $ref: '#/parameters/Timestamp'
+      - $ref: '#/parameters/EdgeID'
+      responses:
+        204:
+          description:  Updated
+        400:
+          description: Parameter Mismatch
+        404:
+          description: Not Found
+
+
+    delete:
+      operationId: delete
+      summary: Delete message by ID
+      parameters:
+      - $ref: '#/parameters/id'
+      responses:
+        204:
+          description:  Deleted
+        400:
+          description: Parameter Mismatch
+        404:
+          description: Not Found
+
+          
+    get:
+      operationId: read
+      summary: Read message by ID
+      parameters:
+      - $ref: '#/parameters/id'
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              DStatus:
+                type: string
+              Timestamp:
+                type: string
+              EdgeID:
+                type: string
+        400:
+          description: Parameter Mismatch
+        404:
+          description: Not Found          
+
+  /list:
+          
+    get:
+      operationId: list
+      summary: list of ID
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              values:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ID:
+                      type: string
+
+        400:
+          description: Parameter Mismatch
+        404:
+          description: Not Found
+
+  /{id}/history:
+
+    get:
+      operationId: history
+      summary: Return history by ID
+      parameters:
+      - $ref: '#/parameters/id'
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              values:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    DStatus:
+                      type: string
+                    Timestamp:
+                      type: string
+                    EdgeID:
+                      type: string
+  
+        400:
+          description: Parameter Mismatch
+        404:
+          description: Not Found
+
+
+  /search/{wildcard}:
+
+    get:
+      operationId: search
+      summary: Find Rssi by wildcard search in the Rssi strings
+      description: Search for all matching IDs, given a (regex) value expression and return both the IDs and Rssi. For example '^H.llo' will match any string starting with 'Hello' or 'Hallo'.
+      parameters:
+      - name: wildcard
+        in: path
+        description: Wildcard regular expression to match against Rssis
+        required: true
+        type: string
+        maxLength: 64
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              values:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    DStatus:
+                      type: string
+                    Timestamp:
+                      type: string
+                    EdgeID:
+                      type: string
+                    
+        400:
+          description: Parameter Mismatch
